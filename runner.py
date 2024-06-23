@@ -19,6 +19,7 @@ moveFont = pygame.font.Font("OpenSans-Regular.ttf", 60)
 
 user = None
 board = ttt.initial_state()
+ttt.actions(board)
 ai_turn = False
 
 while True:
