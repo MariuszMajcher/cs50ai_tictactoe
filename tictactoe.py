@@ -8,7 +8,6 @@ X = "X"
 O = "O"
 EMPTY = None
 
-possibilities = set()
 
 sys.setrecursionlimit(26830)
 
