@@ -11,8 +11,7 @@ EMPTY = None
 
 sys.setrecursionlimit(26830)
 
-# I guess it does not pass in the cs50 as it uses its own runner.py file, need to 
-# make all the functionality inside this file
+# Ok last error, the one where when x wins it supposed to return None
 
 def initial_state():
     """
@@ -55,6 +54,7 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
+    
     try:
  
         row, column = action
@@ -63,6 +63,8 @@ def result(board, action):
             new_board[row][column] = player(new_board)
            
             return new_board
+        else:
+            raise ValueError("Invalid action")
         
     except:
         raise ValueError("Invalid action")
