@@ -40,17 +40,13 @@ def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-   
+    possibible_moves = set()
     
     for row in range(3):
-        # print("ROW : " + str(row))
         for column in range(3):
-            # print("COLUMN : " + str(column))
-            #This seems to not work very well , does add just few items, it is a set, i think it will treat 1,0 same as 0,1
             if board[row][column] is EMPTY:
-                # print("ADDED : " + str(row) + ", " + str(column))
-                possibilities.add((row,column))
-    return possibilities
+                possibible_moves.add((row,column))
+    return possibible_moves
 
 
 def result(board, action):
@@ -58,17 +54,16 @@ def result(board, action):
     Returns the board that results from making move (i, j) on the board.
     """
     try:
-        new_board = copy.deepcopy(board)
-        
+ 
         row, column = action
         if action in possibilities:
+            new_board = copy.deepcopy(board)
             new_board[row][column] = player(new_board)
-            actions(new_board)
+           
             return new_board
-        else:
-            return new_board
+        
     except:
-        raise TypeError
+        raise ValueError("Invalid action")
 
 
 def winner(board):
@@ -81,30 +76,38 @@ def winner(board):
             return "X"
         if row.count("O") == 3:
             return "O"
-    rotated_board = list(zip(board[::-1]))
+    rotated_board = list(zip(*board[::-1]))
+   
     for column in rotated_board:
+
         if column.count("X") == 3:
             return "X"
         if column.count("O") == 3:
             return "O"
-    diagonals = [[],[]]
-    for row in range(len(board)):
-        for column in range(row):
-            if row == column and row is not EMPTY:
-                diagonals[0].append(board[row][column])
-                if row == 1 and column == 1:
-                    diagonals[1].append(board[row][column])
-            if row + 2 == column or row == column + 2 and row is not EMPTY:
-                diagonals[1].append(board[row][column])
-    for diagonal in diagonals:
-        if diagonal.count("X") == 3:
-            
-            return "X"
-        if diagonal.count("O") == 3:
-            
-            return "O"
-    if len(possibilities) == 0:
-        
+    diagonal_left = []
+    diagonal_right = []
+    for row in range(3):
+        for column in range(3):
+            if  row == 0 and column == 0:
+                diagonal_left.append(board[row][column])
+            if  row == 1 and column == 1:
+                diagonal_left.append(board[row][column])
+                diagonal_right.append(board[row][column])
+            if  row == 2 and column == 2:
+                diagonal_left.append(board[row][column])
+            if  row == 0 and column == 2:
+                diagonal_right.append(board[row][column])
+            if row == 2 and column == 0:
+                diagonal_right.append(board[row][column])
+    if diagonal_left.count("X") ==3:
+        return "X"
+    if diagonal_left.count("O") == 3:
+        return "O"
+    if diagonal_right.count("X") == 3:
+        return "X"
+    if diagonal_right.count("O") == 3:
+        return "O"
+    else:
         return None
 
     
@@ -114,7 +117,7 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    if winner(board):
+    if winner(board) == "X" or winner(board) == "O" or sum([row.count(EMPTY) for row in board]) == 0:
         return True
     else:
         return False
@@ -124,38 +127,73 @@ def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
-    if winner(board) == "X":
-        return 1
-    if winner(board) == "O":
-        return -1
-    if board.count(EMPTY) == 0:
-        return 0
+    if terminal(board):
+        if winner(board) == "X":
+            return 1
+        if winner(board) == "O":
+            return -1
+        else:
+            return 0
 
 
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
+    # First need to create a copy of all the possible moves and use this 
+    # to create scenarios, each time it recurses it will need to keep track of 
+    # its separate possible move
 
-    for possible_move in possibilities:
-        final = recursive_play(board, possible_move)
-        if player(board) == "X":
-            if final == 1:
-                print("1")
-                return possible_move
-        if player(board) == "O":
-            if final == -1:
-                print("-1")
-                return possible_move
-            
-
-def recursive_play(board, action):
-    while not terminal(board):
-        new_board = result(board, action)
-        while len(possibilities) > 0:
-            print("New iteration")
-            for possible_move in possibilities:
-                print(possible_move)
-                recursive_play(board,possible_move)
+    current_player = player(board) 
     
-    return utility(board)   
+
+    #It will need to have only these imediate possible moves to choose from
+    #Rest of the code will determine which move to choose
+    if current_player == "O":
+        array_of_moves = []
+        
+        for action in actions(board):
+            array_of_moves.append([action, max_value(result(board, action))])
+        initial_value = math.inf
+        for action, value in array_of_moves:
+            if value < initial_value:
+                initial_value = value
+                move = action
+        return move
+    
+    if current_player == "X":
+        array_of_moves = []
+        
+        for action in actions(board):
+            array_of_moves.append([action, min_value(result(board, action))])
+        initial_value = -math.inf
+        for action, value in array_of_moves:
+            if value > initial_value:
+                
+                initial_value = value
+                move = action
+        return move
+
+def min_value(board):
+    """
+    Will want to choose the move that leads to minimum value
+    """
+    if terminal(board):
+       return utility(board)
+    v = math.inf
+    for action in actions(board):
+
+        v = min(v, max_value(result(board, action)))
+    return v
+    
+def max_value(board):
+    """
+    Will want to choose the move that leads to maximum value
+    """
+    
+    if terminal(board):
+       return utility(board)
+    v = -math.inf
+    for action in actions(board):
+        v = max(v, min_value(result(board, action)))
+    return v
