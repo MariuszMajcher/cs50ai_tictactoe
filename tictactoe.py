@@ -12,6 +12,9 @@ possibilities = set()
 
 sys.setrecursionlimit(26830)
 
+# I guess it does not pass in the cs50 as it uses its own runner.py file, need to 
+# make all the functionality inside this file
+
 def initial_state():
     """
     Returns starting state of the board.
@@ -56,7 +59,7 @@ def result(board, action):
     try:
  
         row, column = action
-        if action in possibilities:
+        if action in actions(board):
             new_board = copy.deepcopy(board)
             new_board[row][column] = player(new_board)
            
@@ -140,15 +143,10 @@ def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    # First need to create a copy of all the possible moves and use this 
-    # to create scenarios, each time it recurses it will need to keep track of 
-    # its separate possible move
+    
 
     current_player = player(board) 
     
-
-    #It will need to have only these imediate possible moves to choose from
-    #Rest of the code will determine which move to choose
     if current_player == "O":
         array_of_moves = []
         
