@@ -146,8 +146,7 @@ def minimax(board):
             array_of_moves.append([action, max_value(result(board, action))])
         initial_value = math.inf
         for action, value in array_of_moves:
-            if value == -1:
-                return move
+         
             if value < initial_value:
                 initial_value = value
                 move = action
@@ -160,8 +159,8 @@ def minimax(board):
             array_of_moves.append([action, min_value(result(board, action))])
         initial_value = -math.inf
         for action, value in array_of_moves:
-            if value == 1:
-                return move
+           
+                
             if value > initial_value:
                 
                 initial_value = value
@@ -172,7 +171,6 @@ def min_value(board):
     """
     Will want to choose the move that leads to minimum value
     """
-    minimal = -1
     if terminal(board):
        return utility(board)
     v = math.inf
@@ -185,7 +183,6 @@ def max_value(board):
     """
     Will want to choose the move that leads to maximum value
     """
-    maximal = 1
     if terminal(board):
        return utility(board)
     v = -math.inf
