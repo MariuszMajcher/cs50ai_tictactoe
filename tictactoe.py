@@ -90,19 +90,10 @@ def winner(board):
             return "O"
     diagonal_left = []
     diagonal_right = []
-    for row in range(3):
-        for column in range(3):
-            if  row == 0 and column == 0:
-                diagonal_left.append(board[row][column])
-            if  row == 1 and column == 1:
-                diagonal_left.append(board[row][column])
-                diagonal_right.append(board[row][column])
-            if  row == 2 and column == 2:
-                diagonal_left.append(board[row][column])
-            if  row == 0 and column == 2:
-                diagonal_right.append(board[row][column])
-            if row == 2 and column == 0:
-                diagonal_right.append(board[row][column])
+    
+    diagonal_left.extend([board[0][0], board[1][1], board[2][2]])
+    diagonal_right.extend([board[0][2], board[1][1], board[2][0]])
+
     if diagonal_left.count("X") ==3:
         return "X"
     if diagonal_left.count("O") == 3:
@@ -155,6 +146,8 @@ def minimax(board):
             array_of_moves.append([action, max_value(result(board, action))])
         initial_value = math.inf
         for action, value in array_of_moves:
+            if value == -1:
+                return move
             if value < initial_value:
                 initial_value = value
                 move = action
@@ -167,6 +160,8 @@ def minimax(board):
             array_of_moves.append([action, min_value(result(board, action))])
         initial_value = -math.inf
         for action, value in array_of_moves:
+            if value == 1:
+                return move
             if value > initial_value:
                 
                 initial_value = value
@@ -177,11 +172,13 @@ def min_value(board):
     """
     Will want to choose the move that leads to minimum value
     """
+    minimal = -1
     if terminal(board):
        return utility(board)
     v = math.inf
     for action in actions(board):
-
+        if v == minimal:
+            return v
         v = min(v, max_value(result(board, action)))
     return v
     
@@ -189,10 +186,12 @@ def max_value(board):
     """
     Will want to choose the move that leads to maximum value
     """
-    
+    maximal = 1
     if terminal(board):
        return utility(board)
     v = -math.inf
     for action in actions(board):
+        if v == maximal:
+            return v
         v = max(v, min_value(result(board, action)))
     return v
